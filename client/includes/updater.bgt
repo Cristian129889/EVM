@@ -4,6 +4,7 @@ void batualizacao(bool avisa){
 	network_event et;
 	timer tt;
 	string vser="";
+	bool conectou=false;
 	nt.setup_client(4, 100);
 	nt.connect(serveraddress, serverport);
 	tt.restart();
@@ -13,16 +14,22 @@ void batualizacao(bool avisa){
 		et=nt.request();
 		if(et.type==event_disconnect)break;
 		if(et.type==event_connect){
+			conectou=true;
 			nt.send_reliable(et.peer_id, "pedirversao", 0);
 		}
 		if(et.type==event_receive){
 			string[] pv=string_split(receber(et.message), " ", false);
 			if(pv[0]=="versaoatual"&&pv.length()>1)vser=pv[1];
 		}
-		if(tt.elapsed>=connecttime)break;
+		if(tt.elapsed>=5000)break;
 	}
 	if(vser==""){
-		dlg(pu.get_value("Não foi possível conectar ao servidor para verificações."));
+		if(conectou){
+			dlg(pu.get_value("O servidor não respondeu à verificação. O servidor precisa ser recompilado com a versão nova para essa função funcionar."));
+		}
+		else{
+			dlg(pu.get_value("Não foi possível conectar ao servidor para verificações."));
+		}
 		menuprincipal();
 	}
 	else if(vser==ver){
@@ -37,19 +44,9 @@ void batualizacao(bool avisa){
 	}
 }
 
-
 void atualizarv(){
-	speak(pu.get_value("Iniciando o processo de atualização..."));
-	sound updating;
-	updating.stream("update_starting.ogg");
-	updating.play_wait();
-	string status=dl_file(DOWNLOAD_URL, INSTALLER_NAME);
-	if(status=="finished"){
-		updatemus.stop();
-		updatedone.play_wait();
-		speak(nomejogo+" "+vernova+" "+pu.get_value("Acabou de ser baixado!"));
-		wait(1000);
-		run(INSTALLER_NAME, "", false, false);
-		exit();
-	}
+	speak(pu.get_value("Abrindo a página de download no navegador..."));
+	run("rundll32.exe", "url.dll,FileProtocolHandler "+DOWNLOAD_URL, false, false);
+	speak(pu.get_value("Baixe o instalador e abra-o para atualizar o jogo."));
+	menuprincipal();
 }
