@@ -1,20 +1,43 @@
 void batualizacao(bool avisa){
-	latest=url_get(UPDATE_URL);
-	if(string_contains(latest, "versão:", 1)==-1){
-		dlg(pu.get_value("Erro ao checar por atualizações. Os motivos podem ser que você esteja usando uma versão beta, ou o servidor não pode ser carregado."));
+	speak(pu.get_value("Conectando ao servidor para verificar atualizações..."));
+	network nt;
+	network_event et;
+	timer tt;
+	string vser="";
+	nt.setup_client(4, 100);
+	nt.connect(serveraddress, serverport);
+	tt.restart();
+	while(vser==""){
+		wait(5);
+		if(key_pressed(KEY_ESCAPE))break;
+		et=nt.request();
+		if(et.type==event_disconnect)break;
+		if(et.type==event_connect){
+			nt.send_reliable(et.peer_id, "pedirversao", 0);
+		}
+		if(et.type==event_receive){
+			string[] pv=string_split(receber(et.message), " ", false);
+			if(pv[0]=="versaoatual"&&pv.length()>1)vser=pv[1];
+		}
+		if(tt.elapsed>=connecttime)break;
+	}
+	if(vser==""){
+		dlg(pu.get_value("Não foi possível conectar ao servidor para verificações."));
 		menuprincipal();
 	}
-	latest=string_replace(latest, "versão:", "", true);
-	if((latest==ver)&&(avisa==false)){
+	else if(vser==ver){
 		dlg(pu.get_value("Nenhuma atualização até o momento."));
 		menuprincipal();
 	}
-	else if(latest!=ver){
-		vernova=latest;
+	else{
+		vernova=vser;
 		updatefound.play_wait();
+		dlg(pu.get_value("Foi encontrada uma nova versão do jogo. A sua versão é")+" "+ver+". "+pu.get_value("A nova versão é")+" "+vernova+".");
 		updatemenu();
 	}
 }
+
+
 void atualizarv(){
 	speak(pu.get_value("Iniciando o processo de atualização..."));
 	sound updating;

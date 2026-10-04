@@ -711,6 +711,7 @@ void netloop(){
 		string[] parsed=string_split(get_event_message()," ",true);
 		if(parsed[0]=="xt55"&&parsed.length()>4)create(parsed[1],parsed[2],parsed[3], string_to_number(parsed[4]), event.peer_id);
 		else if(parsed[0]=="h33j"&&parsed.length()>4)login(event.peer_id, parsed[1],parsed[2],string_to_number(parsed[3]),parsed[4]);
+		else if(parsed[0]=="pedirversao")send_reliable(event.peer_id,"versaoatual "+version, 0);
 		if(index>-1&&index<players.length){
 			if(parsed[0]=="a"&&pvp)atirar(index, string_to_number(parsed[1]), string_to_number(parsed[2]));
 			else if(parsed[0]=="a2"&&pvp)atirar2(index, string_to_number(parsed[1]), string_to_number(parsed[2]));
@@ -2162,6 +2163,7 @@ send_reliable(0,"msgdepois "+players[index].charname+" aora es  pacifista!", 0);
 }
 void login (int id, string un, string pw,double ver, string compid=""){
 	bool cont=true;
+	send_reliable(id,"versaoatual "+version, 0);
 	string ip=net.get_peer_address(id);
 	for(uint i=0;i<nban.length();i++){
 		string[] z=string_split(nban[i], " ", false);
@@ -2174,10 +2176,6 @@ void login (int id, string un, string pw,double ver, string compid=""){
 	if(banido(compid)==true){
 		cont=false;
 		send_reliable(id,"Erro: Você foi banido.",0);
-	}
-	else if (minversion>ver){
-		cont=false;
-		send_reliable(id,"updatenow",0);
 	}
 	else if(players.length()>=playerlimit){
 		send_reliable(id,"Erro: O servidor está cheio no momento. Por favor tente mais tarde. Desculpe. O número máximo de jogadores é "+playerlimit+".",0);

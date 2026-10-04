@@ -108,9 +108,12 @@ void logar(bool localhost=false){
 					username=un;
 					game();
 				}
-				if(parsed[0]=="updatenow"){
-					dlg(pu.get_value("Erro: Você precisa da última versão para poder jogar. Por favor atualiza para a última versão em checar por atualizações, ou visite")+"http://www.desafiomortal.megadimensao.com.br");
-					menuprincipal();
+				if(parsed[0]=="versaoatual"&&parsed.length()>1){
+					if(parsed[1]!=ver){
+						vernova=parsed[1];
+						updatefound.play_wait();
+						dlg(pu.get_value("Foi encontrada uma nova versião do jogo. A sua versião é")+" "+ver+". "+pu.get_value("A nova versião é")+" "+vernova+".");
+					}
 				}
 				if(string_contains(string_to_lower_case(pegar_mensagem()),"erro",1)>-1){
 					dlg(pu.get_value(pegar_mensagem()));

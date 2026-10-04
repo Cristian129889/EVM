@@ -1,6 +1,6 @@
 const string GAME_NAME="Entre a vida e a morte";
 const double minversion=1.0;
-const string version="test";
+const string version="1.0";
 const string EXECUTABLE_NAME="client.exe";
 const string INSTALLER_NAME="EVM_setup.exe";
 const string DOWNLOAD_URL="http://localhost/EVM_setup.exe";
