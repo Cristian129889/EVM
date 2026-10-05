@@ -3,3 +3,10 @@ server/log.md
 client/EVM.dat
 client/sounds.dat
 server/maps/s tima_caverna.map
+
+# Binarios generados por compilacion
+client/client.exe
+client/actualizador.exe
+updater/actualizador.exe
+updater/*.obj
+updater/*.pdb

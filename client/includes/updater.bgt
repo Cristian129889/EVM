@@ -49,72 +49,12 @@ void atualizarv(){
 	sound updating;
 	updating.stream("update_starting.ogg");
 	updating.play_wait();
-	file fo;
-	if(!fo.open(INSTALLER_NAME,"wb")){
-		dlg(pu.get_value("Não foi possível criar o arquivo do instalador."));
-		menuprincipal();
-		return;
-	}
-	network nt;
-	network_event et;
-	timer tt;
-	double off=0;
-	double tam=0;
-	double percent=-1;
-	bool erro=false;
-	bool fim=false;
-	nt.setup_client(4, 100);
-	nt.connect(serveraddress, serverport);
-	tt.restart();
-	while(!fim&&!erro){
-		wait(5);
-		if(key_pressed(KEY_ESCAPE)){
-			erro=true;
-		}
-		et=nt.request();
-		if(et.type==event_connect){
-			nt.send_reliable(et.peer_id, "instreq "+off, 0);
-		}
-		else if(et.type==event_disconnect){
-			erro=true;
-		}
-		else if(et.type==event_receive){
-			string msg=receber(et.message);
-			string[] pv=string_split(msg, " ", false);
-			if(pv[0]=="insdata"&&pv.length()>4){
-				tam=string_to_number(pv[2]);
-				string bruto=string_base64_decode(string_replace(msg, "insdata "+pv[1]+" "+pv[2]+" ", "", false));
-				fo.write(bruto);
-				off=off+bruto.length();
-				if(tam>0){
-					double p=round(off/tam*100,0);
-					if(p!=percent){
-						percent=p;
-						beep_percentage(percent);
-					}
-				}
-				nt.send_reliable(et.peer_id, "instreq "+off, 0);
-			}
-			else if(pv[0]=="insfim"){
-				fim=true;
-			}
-			else if(pv[0]=="inserr"){
-				erro=true;
-			}
-		}
-		if(tt.elapsed>=DOWNLOAD_TIMEOUT)erro=true;
-	}
-	fo.close();
-	if(erro){
-		file_delete(INSTALLER_NAME);
-		dlg(pu.get_value("Falha ao baixar o instalador. O servidor precisa ter o arquivo")+" "+INSTALLER_NAME+" "+pu.get_value("na mesma pasta."));
+	if(!file_exists(UPDATER_NAME)){
+		dlg(pu.get_value("Não foi possível encontrar o atualizador")+" "+UPDATER_NAME+" "+pu.get_value("na mesma pasta do jogo."));
 		menuprincipal();
 		return;
 	}
 	updatemus.stop();
-	updatedone.play_wait();
-	speak(nomejogo+" "+vernova+" "+pu.get_value("Acabou de ser baixado!"));
-	wait(1000);
-	run(INSTALLER_NAME, "", false, false);
+	run(UPDATER_NAME+" --url "+UPDATE_BASE_URL+" --ver "+ver+" --exe "+EXECUTABLE_NAME, "", false, false);
 	exit();
 }

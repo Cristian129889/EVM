@@ -712,8 +712,7 @@ void netloop(){
 		if(parsed[0]=="xt55"&&parsed.length()>4)create(parsed[1],parsed[2],parsed[3], string_to_number(parsed[4]), event.peer_id);
 		else if(parsed[0]=="h33j"&&parsed.length()>4)login(event.peer_id, parsed[1],parsed[2],string_to_number(parsed[3]),parsed[4]);
 		else if(parsed[0]=="pedirversao")send_reliable(event.peer_id,"versaoatual "+version, 0);
-		else if(parsed[0]=="instreq"&&parsed.length()>1)enviarinst(event.peer_id, string_to_number(parsed[1]));
-		if(index>-1&&index<players.length){
+				if(index>-1&&index<players.length){
 			if(parsed[0]=="a"&&pvp)atirar(index, string_to_number(parsed[1]), string_to_number(parsed[2]));
 			else if(parsed[0]=="a2"&&pvp)atirar2(index, string_to_number(parsed[1]), string_to_number(parsed[2]));
 			else if(parsed[0]=="close"){
@@ -2161,27 +2160,6 @@ send_reliable(0,"msgdepois "+players[index].charname+" aora es  pacifista!", 0);
 			else send_reliable(players[index].peer_id, "msgvocênãotem 300", 0);
 		}
 	}
-}
-void enviarinst(int id, double off){
-	file fi;
-	if(!file_exists(INSTALLER_NAME)||!fi.open(INSTALLER_NAME,"rb")){
-		send_reliable(id,"inserr",0);
-		return;
-	}
-	double tam=fi.size;
-	if(off>=tam){
-		fi.close();
-		send_reliable(id,"insfim",0);
-		return;
-	}
-	fi.seek(off);
-	string dados=fi.read(INSTALL_CHUNK);
-	fi.close();
-	if(dados.length()<=0){
-		send_reliable(id,"insfim",0);
-		return;
-	}
-	send_reliable(id,"insdata "+off+" "+tam+" "+string_base64_encode(dados),0);
 }
 void login (int id, string un, string pw,double ver, string compid=""){
 	bool cont=true;
